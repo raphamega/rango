@@ -2,6 +2,7 @@ from decimal import Decimal
 from django.shortcuts import redirect, render
 from pedido.models import Pedido, Item, Acrescimo, Mesa
 from produto.models import Produto_Model
+from django.contrib.auth.decorators import login_required
 from .forms import *
 from .models import *
 from .tests import *
@@ -9,6 +10,7 @@ from loja.models import Loja_Model
 
 
 # Create your views here.
+@login_required
 def caixa_home(request):
     template_name = "caixa/caixa_home.html"
     form = CaixaForm()
@@ -39,6 +41,7 @@ def caixa_home(request):
     )
     return render(request, template_name, context)
 
+@login_required
 def caixa_add(request):
     template = 'caixa:caixa_home'
     loja = Loja_Model.objects.get(usuario=request.user.id)
@@ -62,6 +65,7 @@ def caixa_add(request):
 
     return redirect(template)
 
+@login_required
 def registradora_home(request, pk):
     template = "caixa/pdv.html"
     loja = Loja_Model.objects.get(usuario=request.user.id)
@@ -173,6 +177,7 @@ def registradora_home(request, pk):
         
         return render(request, template, context)
 
+@login_required
 def busca_produto(request, pk):
     qbusca= request.GET.get('q')
     if qbusca :
@@ -240,6 +245,7 @@ def busca_produto(request, pk):
     else:
         return redirect("caixa:registradora_home", pk=pk)
 
+@login_required
 def registradora_item(request, pk):
     pedido = request.POST.get('pedido_id')
     pedido = Pedido.objects.get(id=pedido)
@@ -390,6 +396,7 @@ def registradora_item(request, pk):
 
     return redirect("caixa:registradora_home", pk=pedido.pk)
 
+@login_required
 def observacao(request):
     pedido = request.POST.get('pedido_id')
     id = request.POST.get("item_id")
@@ -404,6 +411,7 @@ def observacao(request):
     pedido =  Pedido.objects.get(id=pedido)
     return redirect("caixa:registradora_home", pk=pedido.pk)
 
+@login_required
 def registradora_remover_item(request):
     pedido = request.POST.get('pedido_id')
     id = request.POST.get('remove')
@@ -461,7 +469,7 @@ def registradora_remover_item(request):
     pedido = Pedido.objects.get(id=pedido)
     return redirect("caixa:registradora_home", pk=pedido.pk)
 
-
+@login_required
 def registradora_acrecimo(request):
     loja_id = request.POST.get('loja_id')
     id = request.POST.get('add_id')
@@ -623,6 +631,7 @@ def registradora_acrecimo(request):
 
     return redirect("caixa:registradora_home", pk=pedido.pk)
 
+@login_required
 def acrescimo_list(request, pk):
     acrescimo = Acrescimo.objects.filter(item=pk)
     context = dict(
@@ -630,6 +639,7 @@ def acrescimo_list(request, pk):
     )
     return render(request, "pedido/acrescimo.html", context)
 
+@login_required
 def registradora_entrega(request, pk):
     pedido = Pedido.objects.get(pk=pk)
     item_obj = Item.objects.filter(pedido=pedido.id)
@@ -698,6 +708,7 @@ def registradora_entrega(request, pk):
 
     return redirect('caixa:registradora_home', pk=pk)
 
+@login_required
 def registradora_pagamento(request, pk):
     pedido = Pedido.objects.get(id=pk, usuario=request.user.id)
     if request.method == "POST":
@@ -742,6 +753,7 @@ def registradora_pagamento(request, pk):
 
     return redirect("caixa:registradora_home", pk=pedido.pk)
 
+@login_required
 def registradora_pedido(request, pk):
     pedido = Pedido.objects.get(pk=pk)
     item_obj = Item.objects.filter(pedido=pedido.id)
@@ -785,6 +797,7 @@ def registradora_pedido(request, pk):
 
     return redirect('caixa:registradora_home', pk=pedido.pk)
 
+@login_required
 def registradora_aceitar_pedido(request, pk):
     pedido = Pedido.objects.get(id=pk, usuario=request.user.id)
     pedido.status = 'recebido'
@@ -799,6 +812,7 @@ def registradora_aceitar_pedido(request, pk):
 
     return redirect('pedido:mesa_list')
 
+@login_required
 def registradora_retirar_balcao(request, pk):
     pedido = Pedido.objects.get(pk=pk, usuario=request.user.id)
 
@@ -832,6 +846,7 @@ def registradora_retirar_balcao(request, pk):
 
     return redirect('pedido:mesa_list')
 
+@login_required
 def registradora_retirar_mesa(request, pk):
     pedido = Pedido.objects.get(pk=pk, usuario=request.user.id)
     mesa= Mesa.objects.get(id=request.POST.get('mesa'))
@@ -872,6 +887,7 @@ def registradora_retirar_mesa(request, pk):
 
     return redirect('pedido:mesa_list')
 
+@login_required
 def fechar_mesa(request, pk):
     template_name= "caixa/fechar-mesa.html"
     mesa = Mesa.objects.get(pk=pk)
@@ -895,6 +911,7 @@ def fechar_mesa(request, pk):
 
     return render(request, template_name, context)
 
+@login_required
 def registradora_pagamento_mesa(request, pk):
     mesa = Mesa.objects.get(id=pk, loja=request.user.loja)
     # pedido = Pedido.objects.get(id=pk, usuario=request.user.id)
@@ -942,6 +959,7 @@ def registradora_pagamento_mesa(request, pk):
 
     return redirect("caixa:fechar_mesa", pk=pk)
 
+@login_required
 def registradora_mesa_receber(request, pk):
     mesa = Mesa.objects.get(id=pk, loja=request.user.loja)
     pedido = Pedido.objects.filter(mesa=mesa.id)

@@ -5,6 +5,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import render, get_object_or_404, redirect
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
 from PIL import Image
 from .forms import *
@@ -12,11 +13,12 @@ from .models import *
 
 
 # Create your views here.
+@login_required
 def loja_home(request):
     template_name = "loja/loja_home.html"
     return render(request, template_name)    
 
-
+@login_required
 def gerarUsuario(request):
     template_name = 'registration/form-usuario-add.html'
     form = Usuario_Form(request.POST or None)
@@ -61,7 +63,7 @@ def gerarUsuario(request):
             print(form.error_messages)
     return render(request, template_name, context)
 
-
+@login_required
 def gerarPerfil(request):
     template_name= 'registration/form-usuario-up.html'
     perfil = Usuario_Model.objects.get(usuario = request.user)

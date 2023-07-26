@@ -2,6 +2,7 @@ from django.shortcuts import get_object_or_404, render, redirect
 from PIL import Image
 import os
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.views.generic import TemplateView,ListView, DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.contrib import messages
@@ -10,6 +11,7 @@ from .models import *
 from .forms import Produto_Form
 
 # Create your views here.
+@login_required
 def produto_list(request):
     template_name = "produto/produto_list.html"
     produto = Produto_Model.objects.filter(loja=request.user.loja.id)
@@ -24,6 +26,7 @@ def produto_list(request):
     )
     return render(request, template_name, context)
 
+@login_required
 def adicionar_Produto(request):
     template_name = 'produto/produto_form.html'
     form =  Produto_Form(request.POST or None)
@@ -55,7 +58,7 @@ def adicionar_Produto(request):
             }
     return render(request, template_name, context)
 
-
+@login_required
 def editar_produto(request, pk):
     template_name = 'produto/produto_form.html'
     produto = get_object_or_404(Produto_Model, pk=pk)
@@ -88,10 +91,10 @@ def editar_produto(request, pk):
             }
     return render(request, template_name, context)
 
+
 class Produto_Detalhe(DetailView):
     template_name = 'produto/produto_detail.html'
     model=Produto_Model
-
 
 class Produto_Edit(UpdateView): 
     template_name = 'produto/produto_form.html'

@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
 from produto.models import Produto_Model
 from pedido.models import Pedido
 from django.contrib import messages
@@ -7,6 +8,7 @@ from .forms import *
 
 # Create your views here.
 # INICIO VITRINE
+@login_required
 def pedido_item(request):
     pk= request.POST.get('produto_id')
     loja_id = request.POST.get('loja_id')
@@ -82,6 +84,7 @@ def pedido_item(request):
   
     return redirect("loja:loja_vitrine",slug=lojaslug.loja)
 
+@login_required
 def observacao(request):
     loja_id = request.POST.get('loja_id')
     lojaslug=Loja_Model.objects.get(id=loja_id)
@@ -97,6 +100,7 @@ def observacao(request):
     
     return redirect("loja:loja_vitrine",slug=lojaslug.loja)
 
+@login_required
 def remover_item(request):
     loja_id = request.POST.get('loja_id')
     lojaslug=Loja_Model.objects.get(id=loja_id)
@@ -127,6 +131,7 @@ def remover_item(request):
 
     return redirect("loja:loja_vitrine",slug=lojaslug.loja)
 
+@login_required
 def pedido_acrecimo(request):
     loja_id = request.POST.get('loja_id')
     id = request.POST.get('add_id')
@@ -290,6 +295,7 @@ def pedido_acrecimo(request):
 
     return redirect("loja:loja_vitrine",slug=lojaslug.loja)
 
+@login_required
 def acrescimo_list(request,pk):
     acrescimo = Acrescimo.objects.filter(item=pk)
     context = dict(
@@ -300,6 +306,7 @@ def acrescimo_list(request,pk):
 #Fim VITRINE 
 
 # INICIO CONTROLE DE MESAS
+@login_required
 def mesa_list(request):
     template_name = "caixa/list_mesa.html"
     loja = Loja_Model.objects.get(usuario=request.user)
@@ -323,6 +330,7 @@ def mesa_list(request):
 
     return render(request, template_name, context)
 
+@login_required
 def mesa_criar(request):
     if request.method == 'POST' :
         nome=request.POST.get("mesa")
@@ -363,6 +371,7 @@ def mesa_criar(request):
             mesa.save()
             return redirect('pedido:mesa_list')
 
+@login_required
 def pedido_criar(request):
     pedido= Pedido.objects.create(
             loja=request.user.loja,
@@ -381,6 +390,7 @@ def pedido_criar(request):
 
     return redirect("pedido:mesa_list")
 
+@login_required
 def pedido_delete(request, pk):
     ped =Pedido.objects.get(id=pk)
     ped.delete()
@@ -388,6 +398,7 @@ def pedido_delete(request, pk):
 
     return redirect("pedido:mesa_list")
 
+@login_required
 def mesa_delete(request, pk):
     ped =Mesa.objects.get(id=pk)
     ped.delete()
@@ -395,6 +406,7 @@ def mesa_delete(request, pk):
 
     return redirect("pedido:mesa_list")
 
+@login_required
 def ler_pedido(request, pk):
     ped =Pedido.objects.get(id=pk, loja=request.user.loja)
 
@@ -404,6 +416,7 @@ def ler_pedido(request, pk):
 
     return render(request,"pedido/ler-pedido.html", context)
 
+@login_required
 def pedido_pronto(request, pk):
     ped =Pedido.objects.get(id=pk, loja=request.user.loja)
     print(ped.venda)
@@ -416,6 +429,7 @@ def pedido_pronto(request, pk):
 
     return redirect("pedido:mesa_list")
 
+@login_required
 def pedido_recebido(request, pk):
     ped =Pedido.objects.get(id=pk, loja=request.user.loja)
     ped.status="finalizado"

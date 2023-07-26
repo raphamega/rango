@@ -1,14 +1,19 @@
 from django.shortcuts import render
 from .forms import ContactForm
-from .models import Pag_Contato
+from .models import Pag_Contato, Texto
 
 
 # Create your views here.
 
 def home_page(request):
     tela = "home/index.html"
+    texto = Texto.objects.all()
 
-    return render(request, tela)
+    context = dict(
+        texto=texto
+    )
+
+    return render(request, tela, context)
 
 
 def about_page(request):
