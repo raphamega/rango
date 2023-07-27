@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from produto.models import Produto_Model
 from pedido.models import Pedido
+from caixa.models import Caixa
 from django.contrib import messages
 from .models import *
 from .forms import *
@@ -426,6 +427,13 @@ def pedido_pronto(request, pk):
     else:
         ped.status="finalizado"
         ped.save()
+        caixa = Caixa.objects.create(
+            loja=request.user.loja,
+            tipo = "e",
+            descricao = ped.pedido,
+            valor =ped.total_pedido,
+        )
+        caixa.save()
 
     return redirect("pedido:mesa_list")
 
@@ -434,6 +442,14 @@ def pedido_recebido(request, pk):
     ped =Pedido.objects.get(id=pk, loja=request.user.loja)
     ped.status="finalizado"
     ped.save()
+
+    caixa = Caixa.objects.create(
+        loja=request.user.loja,
+        tipo = "e",
+        descricao = ped.pedido,
+        valor =ped.total_pedido,
+    )
+    caixa.save()
 
     return redirect("pedido:mesa_list")
 

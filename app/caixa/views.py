@@ -816,6 +816,7 @@ def registradora_aceitar_pedido(request, pk):
 def registradora_retirar_balcao(request, pk):
     pedido = Pedido.objects.get(pk=pk, usuario=request.user.id)
 
+
     item_obj = Item.objects.filter(pedido=pedido.id)
     lista = ""
     total=0
@@ -836,13 +837,15 @@ def registradora_retirar_balcao(request, pk):
             lista +=f"<strong>{item.qt} X {item.produto}</strong><br/><p>&nbsp;<strong>Observ:</strong><br/>&nbsp;&nbsp;{item.observacao}</p>"
             total+=item.preco
 
-
+    
     if request.method == "POST":
-        pedido.status= "recebido"
         pedido.venda = "Balcão"
         pedido.pedido=lista
         pedido.total_pedido=total
         pedido.save()
+        if pedido.total_pedido < 0:
+            pedido.status= "recebido"
+            pedido.save()
 
     return redirect('pedido:mesa_list')
 
@@ -962,20 +965,24 @@ def registradora_pagamento_mesa(request, pk):
 @login_required
 def registradora_mesa_receber(request, pk):
     mesa = Mesa.objects.get(id=pk, loja=request.user.loja)
-    pedido = Pedido.objects.filter(mesa=mesa.id)
-    lista = ""
-    for item in pedido :
-        lista += item.pedido
+    if mesa.status == "Pago":
+        return redirect('caixa:caixa_home')
+    else:
+        pedido = Pedido.objects.filter(mesa=mesa.id)
+        lista = ""
+        for item in pedido :
+            lista += item.pedido
 
-    caixa = Caixa.objects.create(
-        loja=request.user.loja,
-        tipo = "e",
-        descricao = lista,
-        valor =mesa.total,
-    )
-    caixa.save()
+        
+        caixa = Caixa.objects.create(
+            loja=request.user.loja,
+            tipo = "e",
+            descricao = lista,
+            valor =mesa.total,
+        )
+        caixa.save()
 
-    mesa.status="Pago"
-    mesa.save()
+        mesa.status="Pago"
+        mesa.save()
 
-    return redirect('pedido:mesa_list')
+        return redirect('pedido:mesa_list')
